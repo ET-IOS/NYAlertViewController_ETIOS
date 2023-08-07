@@ -7,7 +7,6 @@
 
 #import "NYAlertViewController.h"
 
-#import "NYAlertView.h"
 
 @interface NYAlertAction ()
 
@@ -200,6 +199,7 @@ static CGFloat const kDefaultDismissalAnimationDuration = 0.6f;
 
 @interface NYAlertViewPresentationController : UIPresentationController
 
+@property(nonatomic, weak) id <NYAlertViewDelegate> alertViewdelegate;
 @property CGFloat presentedViewControllerHorizontalInset;
 @property CGFloat presentedViewControllerVerticalInset;
 @property (nonatomic) BOOL backgroundTapDismissalGestureEnabled;
@@ -290,6 +290,12 @@ static CGFloat const kDefaultDismissalAnimationDuration = 0.6f;
 }
 
 - (void)tapGestureRecognized:(UITapGestureRecognizer *)gestureRecognizer {
+    
+    if(self.alertViewdelegate && [self.alertViewdelegate respondsToSelector:@selector(alertViewDismissed)]) {
+        NSLog(@"%@",self.alertViewdelegate);
+        [self.alertViewdelegate alertViewDismissed];
+    }
+    
     if (self.backgroundTapDismissalGestureEnabled) {
         [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
     }
@@ -299,7 +305,7 @@ static CGFloat const kDefaultDismissalAnimationDuration = 0.6f;
 
 @interface NYAlertViewController () <UIGestureRecognizerDelegate, UIViewControllerTransitioningDelegate>
 
-@property NYAlertView *view;
+
 @property UIPanGestureRecognizer *panGestureRecognizer;
 @property (nonatomic, strong) id<UIViewControllerTransitioningDelegate> transitioningDelegate;
 
@@ -509,6 +515,7 @@ static CGFloat const kDefaultDismissalAnimationDuration = 0.6f;
             [button setTitleColor:self.buttonTitleColor forState:UIControlStateNormal];
             [button setTitleColor:self.buttonTitleColor forState:UIControlStateHighlighted];
             [button setBackgroundColor:self.buttonColor forState:UIControlStateNormal];
+            [button setBackgroundColor:self.buttonColor forState:UIControlStateHighlighted];
 
             button.titleLabel.font = self.buttonTitleFont;
         }
@@ -615,6 +622,8 @@ static CGFloat const kDefaultDismissalAnimationDuration = 0.6f;
         
         if (action.style != UIAlertActionStyleCancel) {
             [button setBackgroundColor:buttonColor forState:UIControlStateNormal];
+            [button setBackgroundColor:buttonColor forState:UIControlStateHighlighted];
+
         }
     }];
 }
@@ -748,6 +757,7 @@ static CGFloat const kDefaultDismissalAnimationDuration = 0.6f;
                                                           sourceViewController:(UIViewController *)source {
     NYAlertViewPresentationController *presentationController = [[NYAlertViewPresentationController alloc] initWithPresentedViewController:presented
                                                                                                                   presentingViewController:presenting];
+    presentationController.alertViewdelegate = self.alertViewdelegate;
     presentationController.backgroundTapDismissalGestureEnabled = self.backgroundTapDismissalGestureEnabled;
     return presentationController;
 }

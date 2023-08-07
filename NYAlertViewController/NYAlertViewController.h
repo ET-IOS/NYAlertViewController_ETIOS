@@ -6,6 +6,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "NYAlertView.h"
 
 @interface NYAlertAction : NSObject
 
@@ -26,6 +27,12 @@ typedef NS_ENUM(NSInteger, NYAlertViewControllerTransitionStyle) {
     /** Slide the alert view from the bottom of the view */
     NYAlertViewControllerTransitionStyleSlideFromBottom
 };
+
+
+@protocol NYAlertViewDelegate <NSObject>
+-(void)alertViewDismissed;
+@end
+
 
 @interface NYAlertViewController : UIViewController
 
@@ -199,6 +206,11 @@ typedef NS_ENUM(NSInteger, NYAlertViewControllerTransitionStyle) {
  
  @param configurationHandler A block used to configure the text field. The block takes the text field object as a parameter, and can modify the properties of the text field prior to being displayed.
  */
+
 - (void)addTextFieldWithConfigurationHandler:(void (^)(UITextField *textField))configurationHandler;
+
+@property (nonatomic) NYAlertView *view;
+
+@property(nonatomic, weak) id <NYAlertViewDelegate> alertViewdelegate;
 
 @end
